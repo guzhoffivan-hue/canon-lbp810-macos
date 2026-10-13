@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+jobs:
+  build-and-test:
+    runs-on: macos-14
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          brew install libusb pkg-config
+
+      - name: Configure CMake
+        run: |
+          cmake -B build -DBUILD_TESTS=ON
+
+      - name: Build project
+        run: |
+          cmake --build build
+
+      - name: Run unit tests
+        run: |
+          ctest --test-dir build --output-on-failure
+
+      - name: Verify artifacts
+        run: |
+          ls -la build/captusb
+          ls -la build/ppd/LBP810CAPTPPD.ppd
+          otool -L build/captusb

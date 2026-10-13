@@ -1,0 +1,9 @@
+target_sources(
+    libcaptbackend
+    PRIVATE
+    CaptPrinter.cpp
+    StateReporter.cpp
+    Log.cpp
+    PrinterInfo.cpp
+    BufferedWriter.cpp
+)

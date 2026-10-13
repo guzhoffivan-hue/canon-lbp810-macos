@@ -1,0 +1,62 @@
+#pragma once
+#include "Core/PrinterInfo.hpp"
+#include <libusb.h>
+#include <memory>
+#include <string>
+#include <optional>
+
+using libusb_device_ptr = std::unique_ptr<libusb_device, decltype(&libusb_unref_device)>;
+using libusb_device_handle_ptr = std::unique_ptr<libusb_device_handle, decltype(&libusb_close)>;
+using libusb_config_descriptor_ptr = std::unique_ptr<libusb_config_descriptor, decltype(&libusb_free_config_descriptor)>;
+
+class UsbStreambuf;
+
+class UsbPrinter {
+friend UsbStreambuf;
+private:
+    libusb_device_ptr dev;
+    libusb_device_handle_ptr handle;
+    libusb_device_descriptor desc;
+    libusb_config_descriptor_ptr config;
+    libusb_interface_descriptor alt;
+    uint8_t readEp;
+    uint8_t writeEp;
+    bool kernelDriverDetached = false;
+    bool interfaceClaimed = false;
+
+    int open() noexcept;
+    void claim();
+    void detachKernelDriver();
+    void reset() noexcept;
+    void release() noexcept;
+    void reattachKernelDriver() noexcept;
+    void setConfig();
+    void setAltSetting();
+
+    std::string getStringDescriptor(uint8_t idx);
+    std::string getDeviceId();
+public:
+    explicit UsbPrinter(
+        libusb_device_ptr dev,
+        const libusb_device_descriptor& desc,
+        libusb_config_descriptor_ptr config,
+        const libusb_interface_descriptor& alt,
+        uint8_t readEp, uint8_t writeEp
+    ) noexcept;
+    ~UsbPrinter() noexcept;
+
+    UsbPrinter(UsbPrinter&& other) noexcept = default;
+
+    [[nodiscard]] inline uint16_t VendorId() const noexcept {
+        return this->desc.idVendor;
+    }
+
+    [[nodiscard]] inline uint16_t ProductId() const noexcept {
+        return this->desc.idProduct;
+    }
+
+    void Open();
+    void Close() noexcept;
+
+    [[nodiscard]] std::optional<PrinterInfo> GetPrinterInfo();
+};

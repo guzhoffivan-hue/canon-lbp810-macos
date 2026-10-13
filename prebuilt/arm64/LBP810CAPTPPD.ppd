@@ -1,0 +1,237 @@
+*PPD-Adobe: "4.3"
+*%%%% PPD file for LBP-810 with CUPS.
+*%%%% Created by the CUPS PPD Compiler CUPS v2.3.4.
+*FormatVersion: "4.3"
+*FileVersion: "1.0.0"
+*LanguageVersion: English
+*LanguageEncoding: ISOLatin1
+*PCFileName: "LBP810CAPTPPD.ppd"
+*Product: "(LBP-810)"
+*Manufacturer: "Canon"
+*ModelName: "Canon LBP-810"
+*ShortNickName: "Canon LBP-810"
+*NickName: "Canon LBP-810, captppd 1.0.0"
+*PSVersion: "(3010.000) 0"
+*LanguageLevel: "3"
+*ColorDevice: False
+*DefaultColorSpace: Gray
+*FileSystem: False
+*Throughput: "8"
+*LandscapeOrientation: Plus90
+*TTRasterizer: Type42
+*% Driver-defined attributes...
+*cupsCommands: "Clean"
+*1284DeviceID: "MFG:Canon;MDL:LBP-810;CMD:CAPT;VER:1.0;CLS:PRINTER;DES:Canon LBP-810"
+*cupsVersion: 2.3
+*cupsModelNumber: 0
+*cupsManualCopies: True
+*cupsFilter: "application/vnd.cups-raster 0 -"
+*cupsFilter: "application/vnd.cups-command 0 -"
+*cupsLanguages: "en"
+*OpenUI *PageSize/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageSize
+*DefaultPageSize: A4
+*PageSize Letter/Letter: "<</PageSize[612 792]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 6600/cupsInteger2 13>>setpagedevice"
+*PageSize Letter.Borderless/Letter (borderless): "<</PageSize[612 792]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 6600/cupsInteger2 13>>setpagedevice"
+*PageSize Legal/Legal: "<</PageSize[612 1008]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 8400/cupsInteger2 12>>setpagedevice"
+*PageSize Legal.Borderless/Legal (borderless): "<</PageSize[612 1008]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 8400/cupsInteger2 12>>setpagedevice"
+*PageSize Executive/Executive: "<</PageSize[522 756]/ImagingBBox null/cupsInteger0 4350/cupsInteger1 6300/cupsInteger2 10>>setpagedevice"
+*PageSize Executive.Borderless/Executive (borderless): "<</PageSize[522 756]/ImagingBBox null/cupsInteger0 4350/cupsInteger1 6300/cupsInteger2 10>>setpagedevice"
+*PageSize A4/A4: "<</PageSize[595 842]/ImagingBBox null/cupsInteger0 4960/cupsInteger1 7014/cupsInteger2 2>>setpagedevice"
+*PageSize A4.Borderless/A4 (borderless): "<</PageSize[595 842]/ImagingBBox null/cupsInteger0 4960/cupsInteger1 7014/cupsInteger2 2>>setpagedevice"
+*PageSize A5/A5: "<</PageSize[420 595]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4960/cupsInteger2 3>>setpagedevice"
+*PageSize A5.Borderless/A5 (borderless): "<</PageSize[420 595]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4960/cupsInteger2 3>>setpagedevice"
+*PageSize B5/B5: "<</PageSize[516 729]/ImagingBBox null/cupsInteger0 4298/cupsInteger1 6070/cupsInteger2 7>>setpagedevice"
+*PageSize B5.Borderless/B5 (borderless): "<</PageSize[516 729]/ImagingBBox null/cupsInteger0 4298/cupsInteger1 6070/cupsInteger2 7>>setpagedevice"
+*PageSize Env10/Env10: "<</PageSize[297 684]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5692/cupsInteger2 22>>setpagedevice"
+*PageSize Env10.Borderless/Env10 (borderless): "<</PageSize[297 684]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5692/cupsInteger2 22>>setpagedevice"
+*PageSize EnvDL/EnvDL: "<</PageSize[312 624]/ImagingBBox null/cupsInteger0 2598/cupsInteger1 5196/cupsInteger2 24>>setpagedevice"
+*PageSize EnvDL.Borderless/EnvDL (borderless): "<</PageSize[312 624]/ImagingBBox null/cupsInteger0 2598/cupsInteger1 5196/cupsInteger2 24>>setpagedevice"
+*PageSize EnvC5/EnvC5: "<</PageSize[459 649]/ImagingBBox null/cupsInteger0 3826/cupsInteger1 5408/cupsInteger2 21>>setpagedevice"
+*PageSize EnvC5.Borderless/EnvC5 (borderless): "<</PageSize[459 649]/ImagingBBox null/cupsInteger0 3826/cupsInteger1 5408/cupsInteger2 21>>setpagedevice"
+*PageSize EnvMonarch/EnvMonarch: "<</PageSize[279 540]/ImagingBBox null/cupsInteger0 2314/cupsInteger1 4510/cupsInteger2 23>>setpagedevice"
+*PageSize EnvMonarch.Borderless/EnvMonarch (borderless): "<</PageSize[279 540]/ImagingBBox null/cupsInteger0 2314/cupsInteger1 4510/cupsInteger2 23>>setpagedevice"
+*PageSize Postcard/Postcard: "<</PageSize[283 420]/ImagingBBox null/cupsInteger0 2362/cupsInteger1 3506/cupsInteger2 14>>setpagedevice"
+*PageSize Postcard.Borderless/Postcard (borderless): "<</PageSize[283 420]/ImagingBBox null/cupsInteger0 2362/cupsInteger1 3506/cupsInteger2 14>>setpagedevice"
+*PageSize DoublePostcardRotated/DoublePostcardRotated: "<</PageSize[420 567]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4724/cupsInteger2 15>>setpagedevice"
+*PageSize DoublePostcardRotated.Borderless/DoublePostcardRotated (borderless): "<</PageSize[420 567]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4724/cupsInteger2 15>>setpagedevice"
+*PageSize jenv_you4/jenv_you4: "<</PageSize[296 666]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5550/cupsInteger2 26>>setpagedevice"
+*PageSize jenv_you4.Borderless/jenv_you4 (borderless): "<</PageSize[296 666]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5550/cupsInteger2 26>>setpagedevice"
+*PageSize 3x5/3x5: "<</PageSize[216 360]/ImagingBBox null/cupsInteger0 1800/cupsInteger1 3000/cupsInteger2 0>>setpagedevice"
+*PageSize 3x5.Borderless/3x5 (borderless): "<</PageSize[216 360]/ImagingBBox null/cupsInteger0 1800/cupsInteger1 3000/cupsInteger2 0>>setpagedevice"
+*CloseUI: *PageSize
+*OpenUI *PageRegion/Media Size: PickOne
+*OrderDependency: 10 AnySetup *PageRegion
+*DefaultPageRegion: A4
+*PageRegion Letter/Letter: "<</PageSize[612 792]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 6600/cupsInteger2 13>>setpagedevice"
+*PageRegion Letter.Borderless/Letter (borderless): "<</PageSize[612 792]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 6600/cupsInteger2 13>>setpagedevice"
+*PageRegion Legal/Legal: "<</PageSize[612 1008]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 8400/cupsInteger2 12>>setpagedevice"
+*PageRegion Legal.Borderless/Legal (borderless): "<</PageSize[612 1008]/ImagingBBox null/cupsInteger0 5100/cupsInteger1 8400/cupsInteger2 12>>setpagedevice"
+*PageRegion Executive/Executive: "<</PageSize[522 756]/ImagingBBox null/cupsInteger0 4350/cupsInteger1 6300/cupsInteger2 10>>setpagedevice"
+*PageRegion Executive.Borderless/Executive (borderless): "<</PageSize[522 756]/ImagingBBox null/cupsInteger0 4350/cupsInteger1 6300/cupsInteger2 10>>setpagedevice"
+*PageRegion A4/A4: "<</PageSize[595 842]/ImagingBBox null/cupsInteger0 4960/cupsInteger1 7014/cupsInteger2 2>>setpagedevice"
+*PageRegion A4.Borderless/A4 (borderless): "<</PageSize[595 842]/ImagingBBox null/cupsInteger0 4960/cupsInteger1 7014/cupsInteger2 2>>setpagedevice"
+*PageRegion A5/A5: "<</PageSize[420 595]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4960/cupsInteger2 3>>setpagedevice"
+*PageRegion A5.Borderless/A5 (borderless): "<</PageSize[420 595]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4960/cupsInteger2 3>>setpagedevice"
+*PageRegion B5/B5: "<</PageSize[516 729]/ImagingBBox null/cupsInteger0 4298/cupsInteger1 6070/cupsInteger2 7>>setpagedevice"
+*PageRegion B5.Borderless/B5 (borderless): "<</PageSize[516 729]/ImagingBBox null/cupsInteger0 4298/cupsInteger1 6070/cupsInteger2 7>>setpagedevice"
+*PageRegion Env10/Env10: "<</PageSize[297 684]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5692/cupsInteger2 22>>setpagedevice"
+*PageRegion Env10.Borderless/Env10 (borderless): "<</PageSize[297 684]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5692/cupsInteger2 22>>setpagedevice"
+*PageRegion EnvDL/EnvDL: "<</PageSize[312 624]/ImagingBBox null/cupsInteger0 2598/cupsInteger1 5196/cupsInteger2 24>>setpagedevice"
+*PageRegion EnvDL.Borderless/EnvDL (borderless): "<</PageSize[312 624]/ImagingBBox null/cupsInteger0 2598/cupsInteger1 5196/cupsInteger2 24>>setpagedevice"
+*PageRegion EnvC5/EnvC5: "<</PageSize[459 649]/ImagingBBox null/cupsInteger0 3826/cupsInteger1 5408/cupsInteger2 21>>setpagedevice"
+*PageRegion EnvC5.Borderless/EnvC5 (borderless): "<</PageSize[459 649]/ImagingBBox null/cupsInteger0 3826/cupsInteger1 5408/cupsInteger2 21>>setpagedevice"
+*PageRegion EnvMonarch/EnvMonarch: "<</PageSize[279 540]/ImagingBBox null/cupsInteger0 2314/cupsInteger1 4510/cupsInteger2 23>>setpagedevice"
+*PageRegion EnvMonarch.Borderless/EnvMonarch (borderless): "<</PageSize[279 540]/ImagingBBox null/cupsInteger0 2314/cupsInteger1 4510/cupsInteger2 23>>setpagedevice"
+*PageRegion Postcard/Postcard: "<</PageSize[283 420]/ImagingBBox null/cupsInteger0 2362/cupsInteger1 3506/cupsInteger2 14>>setpagedevice"
+*PageRegion Postcard.Borderless/Postcard (borderless): "<</PageSize[283 420]/ImagingBBox null/cupsInteger0 2362/cupsInteger1 3506/cupsInteger2 14>>setpagedevice"
+*PageRegion DoublePostcardRotated/DoublePostcardRotated: "<</PageSize[420 567]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4724/cupsInteger2 15>>setpagedevice"
+*PageRegion DoublePostcardRotated.Borderless/DoublePostcardRotated (borderless): "<</PageSize[420 567]/ImagingBBox null/cupsInteger0 3506/cupsInteger1 4724/cupsInteger2 15>>setpagedevice"
+*PageRegion jenv_you4/jenv_you4: "<</PageSize[296 666]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5550/cupsInteger2 26>>setpagedevice"
+*PageRegion jenv_you4.Borderless/jenv_you4 (borderless): "<</PageSize[296 666]/ImagingBBox null/cupsInteger0 2480/cupsInteger1 5550/cupsInteger2 26>>setpagedevice"
+*PageRegion 3x5/3x5: "<</PageSize[216 360]/ImagingBBox null/cupsInteger0 1800/cupsInteger1 3000/cupsInteger2 0>>setpagedevice"
+*PageRegion 3x5.Borderless/3x5 (borderless): "<</PageSize[216 360]/ImagingBBox null/cupsInteger0 1800/cupsInteger1 3000/cupsInteger2 0>>setpagedevice"
+*CloseUI: *PageRegion
+*DefaultImageableArea: A4
+*ImageableArea Letter/Letter: "5.669291496277 10.079999923706 606.330688476562 781.919982910156"
+*ImageableArea Letter.Borderless/Letter (borderless): "0 0 612 792"
+*ImageableArea Legal/Legal: "5.669291496277 10.079999923706 606.330688476562 997.919982910156"
+*ImageableArea Legal.Borderless/Legal (borderless): "0 0 612 1008"
+*ImageableArea Executive/Executive: "5.669291496277 10.079999923706 516.330688476562 745.919982910156"
+*ImageableArea Executive.Borderless/Executive (borderless): "0 0 522 756"
+*ImageableArea A4/A4: "5.669291496277 10.079999923706 589.330688476562 831.919982910156"
+*ImageableArea A4.Borderless/A4 (borderless): "0 0 595 842"
+*ImageableArea A5/A5: "5.669291496277 10.079999923706 414.330718994141 584.919982910156"
+*ImageableArea A5.Borderless/A5 (borderless): "0 0 420 595"
+*ImageableArea B5/B5: "5.669291496277 10.079999923706 510.330718994141 718.919982910156"
+*ImageableArea B5.Borderless/B5 (borderless): "0 0 516 729"
+*ImageableArea Env10/Env10: "5.669291496277 10.079999923706 291.330718994141 673.919982910156"
+*ImageableArea Env10.Borderless/Env10 (borderless): "0 0 297 684"
+*ImageableArea EnvDL/EnvDL: "5.669291496277 10.079999923706 306.330718994141 613.919982910156"
+*ImageableArea EnvDL.Borderless/EnvDL (borderless): "0 0 312 624"
+*ImageableArea EnvC5/EnvC5: "5.669291496277 10.079999923706 453.330718994141 638.919982910156"
+*ImageableArea EnvC5.Borderless/EnvC5 (borderless): "0 0 459 649"
+*ImageableArea EnvMonarch/EnvMonarch: "5.669291496277 10.079999923706 273.330718994141 529.919982910156"
+*ImageableArea EnvMonarch.Borderless/EnvMonarch (borderless): "0 0 279 540"
+*ImageableArea Postcard/Postcard: "5.669291496277 10.079999923706 277.330718994141 409.920013427734"
+*ImageableArea Postcard.Borderless/Postcard (borderless): "0 0 283 420"
+*ImageableArea DoublePostcardRotated/DoublePostcardRotated: "5.669291496277 10.079999923706 414.330718994141 556.919982910156"
+*ImageableArea DoublePostcardRotated.Borderless/DoublePostcardRotated (borderless): "0 0 420 567"
+*ImageableArea jenv_you4/jenv_you4: "5.669291496277 10.079999923706 290.330718994141 655.919982910156"
+*ImageableArea jenv_you4.Borderless/jenv_you4 (borderless): "0 0 296 666"
+*ImageableArea 3x5/3x5: "5.669291496277 10.079999923706 210.330703735352 349.920013427734"
+*ImageableArea 3x5.Borderless/3x5 (borderless): "0 0 216 360"
+*DefaultPaperDimension: A4
+*PaperDimension Letter/Letter: "612 792"
+*PaperDimension Letter.Borderless/Letter (borderless): "612 792"
+*PaperDimension Legal/Legal: "612 1008"
+*PaperDimension Legal.Borderless/Legal (borderless): "612 1008"
+*PaperDimension Executive/Executive: "522 756"
+*PaperDimension Executive.Borderless/Executive (borderless): "522 756"
+*PaperDimension A4/A4: "595 842"
+*PaperDimension A4.Borderless/A4 (borderless): "595 842"
+*PaperDimension A5/A5: "420 595"
+*PaperDimension A5.Borderless/A5 (borderless): "420 595"
+*PaperDimension B5/B5: "516 729"
+*PaperDimension B5.Borderless/B5 (borderless): "516 729"
+*PaperDimension Env10/Env10: "297 684"
+*PaperDimension Env10.Borderless/Env10 (borderless): "297 684"
+*PaperDimension EnvDL/EnvDL: "312 624"
+*PaperDimension EnvDL.Borderless/EnvDL (borderless): "312 624"
+*PaperDimension EnvC5/EnvC5: "459 649"
+*PaperDimension EnvC5.Borderless/EnvC5 (borderless): "459 649"
+*PaperDimension EnvMonarch/EnvMonarch: "279 540"
+*PaperDimension EnvMonarch.Borderless/EnvMonarch (borderless): "279 540"
+*PaperDimension Postcard/Postcard: "283 420"
+*PaperDimension Postcard.Borderless/Postcard (borderless): "283 420"
+*PaperDimension DoublePostcardRotated/DoublePostcardRotated: "420 567"
+*PaperDimension DoublePostcardRotated.Borderless/DoublePostcardRotated (borderless): "420 567"
+*PaperDimension jenv_you4/jenv_you4: "296 666"
+*PaperDimension jenv_you4.Borderless/jenv_you4 (borderless): "296 666"
+*PaperDimension 3x5/3x5: "216 360"
+*PaperDimension 3x5.Borderless/3x5 (borderless): "216 360"
+*OpenUI *ColorModel/Color Mode: PickOne
+*OrderDependency: 10 AnySetup *ColorModel
+*DefaultColorModel: Black
+*ColorModel Black/Black: "<</cupsColorSpace 3/cupsColorOrder 0/cupsCompression 0>>setpagedevice"
+*CloseUI: *ColorModel
+*OpenUI *Resolution/Resolution: PickOne
+*OrderDependency: 10 AnySetup *Resolution
+*DefaultResolution: 600dpi
+*Resolution 600dpi/600 DPI: "<</HWResolution[600 600]/cupsBitsPerColor 1/cupsRowCount 0/cupsRowFeed 0/cupsRowStep 0/cupsColorSpace 3>>setpagedevice"
+*CloseUI: *Resolution
+*OpenUI *MediaType/Media Type: PickOne
+*OrderDependency: 10 AnySetup *MediaType
+*DefaultMediaType: PlainPaper
+*MediaType PlainPaper/Plain Paper: "<</MediaType(PlainPaper)/cupsMediaType 0>>setpagedevice"
+*MediaType PlainPaperL/Plain Paper L: "<</MediaType(PlainPaperL)/cupsMediaType 2>>setpagedevice"
+*MediaType Ohp/Transparency: "<</MediaType(Ohp)/cupsMediaType 2>>setpagedevice"
+*MediaType ThickPaper/Thick Paper: "<</MediaType(ThickPaper)/cupsMediaType 1>>setpagedevice"
+*MediaType ThickPaperH/Thick Paper H: "<</MediaType(ThickPaperH)/cupsMediaType 4>>setpagedevice"
+*CloseUI: *MediaType
+*OpenUI *cupsDarkness/Darkness: PickOne
+*OrderDependency: 10 AnySetup *cupsDarkness
+*DefaultcupsDarkness: 3
+*cupsDarkness 1/Extra Light: "<</cupsCompression 0>>setpagedevice"
+*cupsDarkness 2/Light: "<</cupsCompression 15>>setpagedevice"
+*cupsDarkness 3/Normal: "<</cupsCompression 31>>setpagedevice"
+*cupsDarkness 4/Dark: "<</cupsCompression 47>>setpagedevice"
+*cupsDarkness 5/Extra Dark: "<</cupsCompression 63>>setpagedevice"
+*CloseUI: *cupsDarkness
+*OpenUI *imageRefinement/Image Refinement: PickOne
+*OrderDependency: 20 AnySetup *imageRefinement
+*DefaultimageRefinement: True
+*imageRefinement False/Disabled: "<</cupsInteger5 0>>setpagedevice"
+*imageRefinement True/Enabled: "<</cupsInteger5 1>>setpagedevice"
+*CloseUI: *imageRefinement
+*OpenUI *tonerSaving/Toner Saving: PickOne
+*OrderDependency: 30 AnySetup *tonerSaving
+*DefaulttonerSaving: False
+*tonerSaving False/Disabled: "<</cupsInteger6 0>>setpagedevice"
+*tonerSaving True/Enabled: "<</cupsInteger6 1>>setpagedevice"
+*CloseUI: *tonerSaving
+*OpenUI *cupsHalftoneType/Dithering type: PickOne
+*OrderDependency: 40 AnySetup *cupsHalftoneType
+*DefaultcupsHalftoneType: auto
+*cupsHalftoneType auto/Default algorithm: ""
+*cupsHalftoneType stochastic/Stochastic algorithm: ""
+*cupsHalftoneType bi-level/Bi-level (label printing): ""
+*cupsHalftoneType foo2zjs/foo2zjs algorithm: ""
+*CloseUI: *cupsHalftoneType
+*DefaultFont: Courier
+*Font AvantGarde-Book: Standard "(1.05)" Standard ROM
+*Font AvantGarde-BookOblique: Standard "(1.05)" Standard ROM
+*Font AvantGarde-Demi: Standard "(1.05)" Standard ROM
+*Font AvantGarde-DemiOblique: Standard "(1.05)" Standard ROM
+*Font Bookman-Demi: Standard "(1.05)" Standard ROM
+*Font Bookman-DemiItalic: Standard "(1.05)" Standard ROM
+*Font Bookman-Light: Standard "(1.05)" Standard ROM
+*Font Bookman-LightItalic: Standard "(1.05)" Standard ROM
+*Font Courier: Standard "(1.05)" Standard ROM
+*Font Courier-Bold: Standard "(1.05)" Standard ROM
+*Font Courier-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Courier-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica: Standard "(1.05)" Standard ROM
+*Font Helvetica-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Bold: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-BoldOblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Narrow-Oblique: Standard "(1.05)" Standard ROM
+*Font Helvetica-Oblique: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Bold: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-BoldItalic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Italic: Standard "(1.05)" Standard ROM
+*Font NewCenturySchlbk-Roman: Standard "(1.05)" Standard ROM
+*Font Palatino-Bold: Standard "(1.05)" Standard ROM
+*Font Palatino-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Palatino-Italic: Standard "(1.05)" Standard ROM
+*Font Palatino-Roman: Standard "(1.05)" Standard ROM
+*Font Symbol: Special "(001.005)" Special ROM
+*Font Times-Bold: Standard "(1.05)" Standard ROM
+*Font Times-BoldItalic: Standard "(1.05)" Standard ROM
+*Font Times-Italic: Standard "(1.05)" Standard ROM
+*Font Times-Roman: Standard "(1.05)" Standard ROM
+*Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
+*Font ZapfDingbats: Special "(001.005)" Special ROM
+*% End of LBP810CAPTPPD.ppd, 17696 bytes.
