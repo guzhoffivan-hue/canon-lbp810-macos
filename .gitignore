@@ -13,3 +13,4 @@ dist/
 *.raster
 *.pbm
 scratch/
+references/
