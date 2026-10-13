@@ -22,6 +22,7 @@
 *% Driver-defined attributes...
 *cupsCommands: "Clean"
 *1284DeviceID: "MFG:Canon;MDL:LBP-810;CMD:CAPT;VER:1.0;CLS:PRINTER;DES:Canon LBP-810"
+*APPrinterIconPath: "/Library/Printers/Icons/CanonLBP-810.icns"
 *cupsVersion: 2.3
 *cupsModelNumber: 0
 *cupsManualCopies: True
@@ -234,4 +235,4 @@
 *Font Times-Roman: Standard "(1.05)" Standard ROM
 *Font ZapfChancery-MediumItalic: Standard "(1.05)" Standard ROM
 *Font ZapfDingbats: Special "(001.005)" Special ROM
-*% End of LBP810CAPTPPD.ppd, 17696 bytes.
+*% End of LBP810CAPTPPD.ppd, 17760 bytes.

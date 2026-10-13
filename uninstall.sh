@@ -43,6 +43,7 @@ killall CanonLBP810Progress 2>/dev/null || true
 echo "==> Removing driver files..."
 rm -f /usr/libexec/cups/backend/captusb
 rm -f /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd
+rm -f /Library/Printers/Icons/CanonLBP-810.icns /Library/Printers/Icons/Canon_LBP810.icns /Library/Printers/Icons/Canon_LBP_810.icns 2>/dev/null || true
 rm -f /usr/share/cups/model/LBP810CAPTPPD.ppd 2>/dev/null || true
 
 if [ -f /usr/libexec/cups/backend/usb.orig ]; then

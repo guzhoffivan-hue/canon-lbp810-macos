@@ -32,16 +32,21 @@ mkdir -p "$PKG_ROOT" "$SCRIPTS_DIR" "$OUTPUT_DIR"
 STASH_DIR="$PKG_ROOT/Library/Application Support/CanonLBP810"
 mkdir -p "$PKG_ROOT/usr/libexec/cups/backend"
 mkdir -p "$PKG_ROOT/Library/Printers/PPDs/Contents/Resources"
+mkdir -p "$PKG_ROOT/Library/Printers/Icons"
 mkdir -p "$PKG_ROOT/Library/LaunchDaemons"
 mkdir -p "$STASH_DIR"
 
 cp "$DIR/prebuilt/arm64/captusb" "$PKG_ROOT/usr/libexec/cups/backend/captusb"
 cp "$DIR/prebuilt/arm64/LBP810CAPTPPD.ppd" "$PKG_ROOT/Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd"
+cp "$DIR/prebuilt/arm64/CanonLBP-810.icns" "$PKG_ROOT/Library/Printers/Icons/CanonLBP-810.icns"
+cp "$DIR/prebuilt/arm64/CanonLBP-810.icns" "$PKG_ROOT/Library/Printers/Icons/Canon_LBP810.icns"
+cp "$DIR/prebuilt/arm64/CanonLBP-810.icns" "$PKG_ROOT/Library/Printers/Icons/Canon_LBP_810.icns"
 
 # Stash for self-healing
 cp "$DIR/prebuilt/arm64/captusb" "$STASH_DIR/captusb"
 cp "$DIR/prebuilt/arm64/usb_filter" "$STASH_DIR/usb_filter"
 cp "$DIR/prebuilt/arm64/LBP810CAPTPPD.ppd" "$STASH_DIR/CanonLBP-810.ppd"
+cp "$DIR/prebuilt/arm64/CanonLBP-810.icns" "$STASH_DIR/CanonLBP-810.icns"
 
 # Heal script
 cat > "$STASH_DIR/heal.sh" << 'HEALEOF'
@@ -55,6 +60,13 @@ QUEUE="Canon_LBP810"
 
 if [ ! -x "$BACKEND" ] && [ -f "$STASH/captusb" ]; then
   /usr/bin/install -o root -g wheel -m 0755 "$STASH/captusb" "$BACKEND"
+fi
+
+if [ -f "$STASH/CanonLBP-810.icns" ]; then
+  /bin/mkdir -p /Library/Printers/Icons
+  /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.icns" /Library/Printers/Icons/CanonLBP-810.icns 2>/dev/null || true
+  /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.icns" /Library/Printers/Icons/Canon_LBP810.icns 2>/dev/null || true
+  /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.icns" /Library/Printers/Icons/Canon_LBP_810.icns 2>/dev/null || true
 fi
 
 if [ -f "$STASH/usb_filter" ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
@@ -126,6 +138,9 @@ chmod 0755 /usr/libexec/cups/backend/captusb 2>/dev/null || true
 chown root:wheel /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd 2>/dev/null || true
 chmod 0644 /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd 2>/dev/null || true
 
+chown -R root:wheel /Library/Printers/Icons/Canon*LBP* 2>/dev/null || true
+chmod 0644 /Library/Printers/Icons/Canon*LBP* 2>/dev/null || true
+
 # Backup original Apple USB backend and install filter
 if [ -f /usr/libexec/cups/backend/usb ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
   cp /usr/libexec/cups/backend/usb /usr/libexec/cups/backend/usb.orig 2>/dev/null || true
@@ -157,6 +172,16 @@ if [ -f "$PPD" ]; then
   /usr/sbin/cupsenable "$QUEUE" 2>/dev/null || true
   /usr/sbin/cupsaccept "$QUEUE" 2>/dev/null || true
 fi
+
+# Ensure active queue PPD references custom icon
+if [ -f "/etc/cups/ppd/$QUEUE.ppd" ] && ! grep -q "APPrinterIconPath" "/etc/cups/ppd/$QUEUE.ppd"; then
+  echo '*APPrinterIconPath: "/Library/Printers/Icons/CanonLBP-810.icns"' >> "/etc/cups/ppd/$QUEUE.ppd"
+fi
+
+# Refresh CUPS daemon and icon cache
+launchctl kickstart -k system/org.cups.cupsd 2>/dev/null || true
+qlmanage -r cache 2>/dev/null || true
+killall PrintCenter 2>/dev/null || true
 
 exit 0
 POSTEOF

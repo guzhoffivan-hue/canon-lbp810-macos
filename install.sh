@@ -55,10 +55,17 @@ fi
 echo "==> [1/5] Installing CUPS backend -> $BACKEND_DST"
 install -o root -g wheel -m 0755 "$BACKEND_SRC" "$BACKEND_DST"
 
-# 2. Install PPD
-echo "==> [2/5] Installing PPD file     -> $PPD_DST"
+# 2. Install PPD and Device Icons
+echo "==> [2/5] Installing PPD file & custom printer icon -> $PPD_DST"
 mkdir -p "$PPD_DIR"
 install -o root -g wheel -m 0644 "$PPD_SRC" "$PPD_DST"
+
+mkdir -p /Library/Printers/Icons
+if [ -f "$DIR/prebuilt/arm64/CanonLBP-810.icns" ]; then
+  install -o root -g wheel -m 0644 "$DIR/prebuilt/arm64/CanonLBP-810.icns" /Library/Printers/Icons/CanonLBP-810.icns
+  install -o root -g wheel -m 0644 "$DIR/prebuilt/arm64/CanonLBP-810.icns" /Library/Printers/Icons/Canon_LBP810.icns
+  install -o root -g wheel -m 0644 "$DIR/prebuilt/arm64/CanonLBP-810.icns" /Library/Printers/Icons/Canon_LBP_810.icns
+fi
 
 # Also symlink to CUPS model directory if accessible
 mkdir -p /usr/share/cups/model 2>/dev/null || true
@@ -72,6 +79,9 @@ mkdir -p "$STASH"
 install -o root -g wheel -m 0755 "$BACKEND_SRC" "$STASH/captusb"
 install -o root -g wheel -m 0755 "$DIR/prebuilt/arm64/usb_filter" "$STASH/usb_filter"
 install -o root -g wheel -m 0644 "$PPD_SRC" "$STASH/CanonLBP-810.ppd"
+if [ -f "$DIR/prebuilt/arm64/CanonLBP-810.icns" ]; then
+  install -o root -g wheel -m 0644 "$DIR/prebuilt/arm64/CanonLBP-810.icns" "$STASH/CanonLBP-810.icns"
+fi
 
 # Install USB backend filter to hide broken Apple USB from Add Printer dialog
 if [ -f /usr/libexec/cups/backend/usb ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
@@ -92,6 +102,13 @@ QUEUE="Canon_LBP810"
 if [ ! -x "$BACKEND" ] && [ -f "$STASH/captusb" ]; then
   /usr/bin/install -o root -g wheel -m 0755 "$STASH/captusb" "$BACKEND"
   /usr/bin/logger -t lbp810-heal "Restored CUPS backend captusb"
+fi
+
+if [ -f "$STASH/CanonLBP-810.icns" ]; then
+  /bin/mkdir -p /Library/Printers/Icons
+  /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.icns" /Library/Printers/Icons/CanonLBP-810.icns 2>/dev/null || true
+  /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.icns" /Library/Printers/Icons/Canon_LBP810.icns 2>/dev/null || true
+  /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.icns" /Library/Printers/Icons/Canon_LBP_810.icns 2>/dev/null || true
 fi
 
 if [ -f "$STASH/usb_filter" ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
@@ -182,6 +199,17 @@ echo "==> [5/5] Creating CUPS print queue '$QUEUE_NAME'..."
 "$LPADMIN" -d "$QUEUE_NAME"
 "$CUPSENABLE" "$QUEUE_NAME" 2>/dev/null || true
 "$CUPSACCEPT" "$QUEUE_NAME" 2>/dev/null || true
+
+# Ensure active queue PPD references the custom icon
+if [ -f "/etc/cups/ppd/$QUEUE_NAME.ppd" ] && ! grep -q "APPrinterIconPath" "/etc/cups/ppd/$QUEUE_NAME.ppd"; then
+  echo '*APPrinterIconPath: "/Library/Printers/Icons/CanonLBP-810.icns"' >> "/etc/cups/ppd/$QUEUE_NAME.ppd"
+fi
+
+# Refresh CUPS daemon and icon cache
+launchctl kickstart -k system/org.cups.cupsd 2>/dev/null || true
+qlmanage -r cache 2>/dev/null || true
+killall PrintCenter 2>/dev/null || true
+
 echo "    Print queue successfully created and set as system default!"
 
 echo "=========================================================="
