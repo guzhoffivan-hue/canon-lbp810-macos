@@ -139,12 +139,17 @@ fi
 
 if [ -n "$DEVICE_URI" ]; then
   echo "    Found printer: $DEVICE_URI"
+  # Remove conflicting legacy / auto-added Apple USB queues
+  "$LPADMIN" -x Canon_LBP_810 2>/dev/null || true
+  "$LPADMIN" -x "Canon_LBP-810" 2>/dev/null || true
+
   echo "==> [5/5] Creating CUPS print queue '$QUEUE_NAME'..."
   "$LPADMIN" -p "$QUEUE_NAME" -v "$DEVICE_URI" -P "$PPD_DST" -E -D "$QUEUE_DESC" \
     -o printer-is-shared=false -o printer-error-policy=retry-job
+  "$LPADMIN" -d "$QUEUE_NAME"
   "$CUPSENABLE" "$QUEUE_NAME" 2>/dev/null || true
   "$CUPSACCEPT" "$QUEUE_NAME" 2>/dev/null || true
-  echo "    Print queue successfully created and enabled!"
+  echo "    Print queue successfully created and set as system default!"
 else
   echo "==> [4/5] Note: Canon LBP-810 is not currently detected on USB."
   echo "    Driver backend, PPD, and self-healing daemon have been installed."
