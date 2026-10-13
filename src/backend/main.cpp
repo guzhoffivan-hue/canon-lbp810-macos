@@ -145,22 +145,33 @@ int main(int argc, const char* argv[]) {
         printer.ReserveUnit();
         Log::Info() << "Unit reserved";
 
-        bool success;
-        if (*contentType == "application/vnd.cups-command") {
-            success = printer.Clean(stopToken);
-        } else {
-            assert(*contentType == "application/vnd.cups-raster");
-            CupsRasterStreambuf cupsRaster;
-            if (!cupsRaster.Open(argc == 7 ? argv[6] : nullptr)) {
-                Log::Critical() << "Failed to open raster stream";
-                return CUPS_BACKEND_FAILED;
+        bool success = false;
+        try {
+            if (*contentType == "application/vnd.cups-command") {
+                success = printer.Clean(stopToken);
+            } else {
+                assert(*contentType == "application/vnd.cups-raster");
+                CupsRasterStreambuf cupsRaster;
+                if (!cupsRaster.Open(argc == 7 ? argv[6] : nullptr)) {
+                    Log::Critical() << "Failed to open raster stream";
+                    return CUPS_BACKEND_FAILED;
+                }
+                success = printer.Print(stopToken, cupsRaster);
             }
-            success = printer.Print(stopToken, cupsRaster);
+        } catch (...) {
+            Log::Debug() << "Exception during print, attempting unit cleanup...";
+            try {
+                printer.GoOffline();
+                printer.ReleaseUnit();
+            } catch (...) {}
+            throw;
         }
 
         Log::Debug() << "Releasing unit...";
-        printer.GoOffline();
-        printer.ReleaseUnit();
+        try {
+            printer.GoOffline();
+            printer.ReleaseUnit();
+        } catch (...) {}
         Log::Debug() << "Unit released";
         return success ? CUPS_BACKEND_OK : CUPS_BACKEND_FAILED;
     } catch (const Capt::UnexpectedBehaviourError& e) {

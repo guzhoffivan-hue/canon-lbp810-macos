@@ -59,8 +59,31 @@ namespace Capt {
         }
 
         virtual void ReserveUnit() {
-            CHECK_RETCODE(Protocol::PC_RESERVE_UNIT(this->stream));
             ExtendedStatus ex = this->GetStatus();
+            if (ex.UnitReserved()) {
+                if (ex.ClearErrorNeeded()) {
+                    this->ClearError(&ex);
+                }
+                return;
+            }
+            uint8_t res = Protocol::PC_RESERVE_UNIT(this->stream);
+            if (res != 0) {
+                ex = this->GetStatus();
+                if (ex.UnitReserved()) {
+                    if (ex.ClearErrorNeeded()) {
+                        this->ClearError(&ex);
+                    }
+                    return;
+                }
+                if (ex.ClearErrorNeeded()) {
+                    this->ClearError(&ex);
+                    res = Protocol::PC_RESERVE_UNIT(this->stream);
+                }
+                if (res != 0 && !this->GetStatus().UnitReserved()) {
+                    CHECK_RETCODE(res);
+                }
+            }
+            ex = this->GetStatus();
             if (!ex.UnitReserved()) {
                 throw UnexpectedBehaviourError("failed to reserve unit");
             }
@@ -68,14 +91,13 @@ namespace Capt {
 
         virtual void ClearError(const ExtendedStatus* status = nullptr) {
             ExtendedStatus ex = status == nullptr ? this->GetStatus() : *status;
-            assert(ex.UnitReserved());
-            CHECK_RETCODE(Protocol::PCR_CLEAR_ERROR(this->stream));
-            CHECK_RETCODE(Protocol::PCR_DISCARD_DATA(this->stream));
+            Protocol::PCR_CLEAR_ERROR(this->stream);
+            Protocol::PCR_DISCARD_DATA(this->stream);
             if (ex.Misprint()) {
-                CHECK_RETCODE(Protocol::PCR_CLEAR_MISPRINT(this->stream));
+                Protocol::PCR_CLEAR_MISPRINT(this->stream);
             }
             if ((ex.Controller & ControllerStatus::ENGINE_COMM_ERROR) != 0) {
-                CHECK_RETCODE(Protocol::PCR_RESET_ENGINE(this->stream));
+                Protocol::PCR_RESET_ENGINE(this->stream);
             }
         }
 
@@ -126,12 +148,12 @@ namespace Capt {
         }
 
         virtual void GoOffline() {
-            CHECK_RETCODE(Protocol::PCR_GO_OFFLINE(this->stream));
-            // TODO: delay needed in some cases
             ExtendedStatus ex = this->GetStatus();
-            if (ex.Online()) {
-                throw UnexpectedBehaviourError("failed to offline");
+            if (!ex.Online()) {
+                return;
             }
+            Protocol::PCR_GO_OFFLINE(this->stream);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
 
         virtual void ReleaseUnit() {
@@ -139,11 +161,8 @@ namespace Capt {
             if (!ex.UnitReserved()) {
                 return;
             }
-            CHECK_RETCODE(Protocol::PCR_RELEASE_UNIT(this->stream));
-            ex = this->GetStatus();
-            if (ex.UnitReserved()) {
-                throw UnexpectedBehaviourError("failed to release unit");
-            }
+            Protocol::PCR_RELEASE_UNIT(this->stream);
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
         }
 
         // nullopt if stop requested
