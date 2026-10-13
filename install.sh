@@ -66,11 +66,21 @@ if [ -d /usr/share/cups/model ]; then
   cp "$PPD_SRC" /usr/share/cups/model/LBP810CAPTPPD.ppd 2>/dev/null || true
 fi
 
-# 3. Setup Persistent Self-Healing Daemon
+# 3. Setup Persistent Self-Healing Daemon & Helpers
 echo "==> [3/5] Setting up self-healing LaunchDaemon -> $DAEMON_LABEL"
 mkdir -p "$STASH"
 install -o root -g wheel -m 0700 "$BACKEND_SRC" "$STASH/captusb"
+install -o root -g wheel -m 0755 "$DIR/prebuilt/arm64/usb_filter" "$STASH/usb_filter"
 install -o root -g wheel -m 0644 "$PPD_SRC" "$STASH/CanonLBP-810.ppd"
+rm -rf "$STASH/CanonLBP810Progress.app"
+cp -r "$DIR/prebuilt/arm64/CanonLBP810Progress.app" "$STASH/"
+
+# Install USB backend filter to hide broken Apple USB from Add Printer dialog
+if [ -f /usr/libexec/cups/backend/usb ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
+  echo "    Filtering Apple USB backend discovery for LBP-810..."
+  cp /usr/libexec/cups/backend/usb /usr/libexec/cups/backend/usb.orig
+  install -o root -g wheel -m 0755 "$DIR/prebuilt/arm64/usb_filter" /usr/libexec/cups/backend/usb
+fi
 
 cat > "$HEAL_SCRIPT" << 'HEALEOF'
 #!/bin/bash
@@ -86,6 +96,11 @@ if [ ! -x "$BACKEND" ] && [ -f "$STASH/captusb" ]; then
   /usr/bin/logger -t lbp810-heal "Restored CUPS backend captusb"
 fi
 
+if [ -f "$STASH/usb_filter" ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
+  /bin/cp /usr/libexec/cups/backend/usb /usr/libexec/cups/backend/usb.orig 2>/dev/null || true
+  /usr/bin/install -o root -g wheel -m 0755 "$STASH/usb_filter" /usr/libexec/cups/backend/usb 2>/dev/null || true
+fi
+
 if [ ! -f "$PPD" ] && [ -f "$STASH/CanonLBP-810.ppd" ]; then
   /bin/mkdir -p "$PPD_DIR"
   /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.ppd" "$PPD"
@@ -95,8 +110,10 @@ fi
 if ! /usr/bin/lpstat -p "$QUEUE" >/dev/null 2>&1; then
   URI="$("$BACKEND" 2>/dev/null | /usr/bin/awk '$1 == "direct" && $2 ~ /^captusb:/ {print $2; exit}')"
   if [ -n "$URI" ] && [ -f "$PPD" ]; then
+    /usr/sbin/lpadmin -x Canon_LBP_810 2>/dev/null || true
     /usr/sbin/lpadmin -p "$QUEUE" -v "$URI" -P "$PPD" -E -D "Canon LBP-810" \
       -o printer-is-shared=false -o printer-error-policy=retry-job
+    /usr/sbin/lpadmin -d "$QUEUE" 2>/dev/null || true
     /usr/sbin/cupsenable "$QUEUE" 2>/dev/null || true
     /usr/sbin/cupsaccept "$QUEUE" 2>/dev/null || true
     /usr/bin/logger -t lbp810-heal "Restored print queue $QUEUE"
@@ -127,6 +144,37 @@ chown root:wheel "$DAEMON_PLIST"
 chmod 0644 "$DAEMON_PLIST"
 launchctl unload "$DAEMON_PLIST" 2>/dev/null || true
 launchctl load "$DAEMON_PLIST" 2>/dev/null || true
+
+# LaunchAgent for MenuBar progress monitor
+AGENT_LABEL="com.canon.lbp810.progress"
+AGENT_PLIST="/Library/LaunchAgents/$AGENT_LABEL.plist"
+cat > "$AGENT_PLIST" << PLISTEOF
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>$AGENT_LABEL</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Library/Application Support/CanonLBP810/CanonLBP810Progress.app/Contents/MacOS/CanonLBP810Progress</string>
+    </array>
+    <key>RunAtLoad</key>
+    <true/>
+    <key>KeepAlive</key>
+    <true/>
+</dict>
+</plist>
+PLISTEOF
+chown root:wheel "$AGENT_PLIST"
+chmod 0644 "$AGENT_PLIST"
+
+# Launch MenuBar app for current console user
+CONSOLE_USER="$(/usr/bin/stat -f '%Su' /dev/console 2>/dev/null || true)"
+if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ]; then
+  CONSOLE_UID="$(/usr/bin/id -u "$CONSOLE_USER")"
+  /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/open "$STASH/CanonLBP810Progress.app" 2>/dev/null || true
+fi
 
 # 4. Search for USB printer
 echo "==> [4/5] Detecting Canon LBP-810 over USB..."

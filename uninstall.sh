@@ -24,18 +24,31 @@ if /usr/sbin/lpstat -p "$QUEUE_NAME" >/dev/null 2>&1; then
   /usr/sbin/lpadmin -x "$QUEUE_NAME"
 fi
 
-# 2. Stop and remove LaunchDaemon
+# 2. Stop and remove LaunchDaemon and LaunchAgent
 if [ -f "$DAEMON_PLIST" ]; then
   echo "==> Removing self-healing LaunchDaemon..."
   launchctl unload "$DAEMON_PLIST" 2>/dev/null || true
   rm -f "$DAEMON_PLIST"
 fi
 
-# 3. Remove backend and PPD
+AGENT_PLIST="/Library/LaunchAgents/com.canon.lbp810.progress.plist"
+if [ -f "$AGENT_PLIST" ]; then
+  echo "==> Removing MenuBar progress agent..."
+  launchctl unload "$AGENT_PLIST" 2>/dev/null || true
+  rm -f "$AGENT_PLIST"
+fi
+killall CanonLBP810Progress 2>/dev/null || true
+
+# 3. Remove backend, PPD, and restore Apple USB backend
 echo "==> Removing driver files..."
 rm -f /usr/libexec/cups/backend/captusb
 rm -f /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd
 rm -f /usr/share/cups/model/LBP810CAPTPPD.ppd 2>/dev/null || true
+
+if [ -f /usr/libexec/cups/backend/usb.orig ]; then
+  echo "==> Restoring original Apple USB backend..."
+  mv -f /usr/libexec/cups/backend/usb.orig /usr/libexec/cups/backend/usb
+fi
 
 # 4. Remove stash
 rm -rf "/Library/Application Support/CanonLBP810"

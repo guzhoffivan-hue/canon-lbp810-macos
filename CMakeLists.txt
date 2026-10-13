@@ -150,6 +150,9 @@ if(EXTRA_SYSTEM_FRAMEWORKS)
     target_link_libraries(captusb PRIVATE ${EXTRA_SYSTEM_FRAMEWORKS})
 endif()
 
+# Build USB backend filter to hide non-working Apple USB device in Add Printer dialog
+add_executable(usb_filter src/backend/usb_filter.c)
+
 # PPD generation
 find_program(PPDC NAMES ppdc REQUIRED)
 find_package(Python REQUIRED)

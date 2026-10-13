@@ -1,5 +1,7 @@
 # Build artifacts
 build/
+build_pkg/
+dist/
 *.o
 *.a
 *.dylib

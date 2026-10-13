@@ -14,6 +14,8 @@ The **Canon LBP-810** is a classic host-based (GDI) laser printer using the prop
 * **Apple Silicon Native (arm64):** Compiled with Clang for Apple Silicon, zero emulation required.
 * **Self-Contained Binary:** Built with static `libusb`, no external Homebrew dependencies at runtime.
 * **System Settings & GUI Integration:** Standard print dialog support across Preview, Safari, Pages, Microsoft Office, etc.
+* **Live Menu Bar Progress:** Native status app displays real-time page progress (`🖨 2/5`) and job notifications in the menu bar.
+* **Clean Hardware Discovery:** Filters out broken default Apple USB entries from the "Add Printer" dialog.
 * **Persistent Self-Healing Daemon:** Survives macOS system updates automatically.
 
 ---
@@ -47,16 +49,18 @@ The **Canon LBP-810** is a classic host-based (GDI) laser printer using the prop
 
 ---
 
-## Quick Start (Installation)
+## Installation
 
-1. Connect the Canon LBP-810 to your Mac via USB and turn it on. Make sure paper is loaded.
-2. In Terminal, navigate to the driver directory and run:
+### Option 1: Graphical Installer (Recommended)
+Open the disk image **`dist/Canon-LBP810-macOS.dmg`** and double-click **`Canon-LBP810-Driver-macOS.pkg`**.
 
+### Option 2: Terminal Setup
+Connect the printer to USB and run:
 ```bash
 ./setup.sh
 ```
 
-`setup.sh` requests administrator permissions when necessary and automatically:
+The installer automatically:
 1. Installs the backend into `/usr/libexec/cups/backend/captusb`.
 2. Installs the PostScript Printer Description file (`CanonLBP-810.ppd`) into `/Library/Printers/PPDs/Contents/Resources/`.
 3. Installs a LaunchDaemon (`com.canon.lbp810.heal`) that automatically restores the driver if a future macOS update wipes `/usr/libexec/cups/backend/`.
