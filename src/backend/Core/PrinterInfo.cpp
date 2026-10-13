@@ -78,6 +78,7 @@ bool PrinterInfo::HasUri(std::string_view uri) const {
     }
 
     const std::string_view query(iter, end);
+    bool hasSerialParam = false;
     for (const auto part : (query | std::views::split('&'))) {
         auto delim = std::ranges::find(part, '=');
         if (delim == part.end()) {
@@ -85,11 +86,15 @@ bool PrinterInfo::HasUri(std::string_view uri) const {
         }
         auto k = std::ranges::subrange(part.begin(), delim);
         auto v = std::ranges::subrange(std::next(delim), part.end());
-        if (std::ranges::equal(k, "serial"sv) && std::ranges::equal(v, this->Serial)) {
-            return true;
+        if (std::ranges::equal(k, "serial"sv)) {
+            hasSerialParam = true;
+            if (std::ranges::equal(v, this->Serial)) {
+                return true;
+            }
         }
     }
-    return false;
+    // If no serial was specified in the URI, match any connected printer of this model
+    return !hasSerialParam;
 }
 
 // device-class

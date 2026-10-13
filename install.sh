@@ -53,7 +53,7 @@ fi
 
 # 1. Install Backend
 echo "==> [1/5] Installing CUPS backend -> $BACKEND_DST"
-install -o root -g wheel -m 0700 "$BACKEND_SRC" "$BACKEND_DST"
+install -o root -g wheel -m 0755 "$BACKEND_SRC" "$BACKEND_DST"
 
 # 2. Install PPD
 echo "==> [2/5] Installing PPD file     -> $PPD_DST"
@@ -69,7 +69,7 @@ fi
 # 3. Setup Persistent Self-Healing Daemon & Helpers
 echo "==> [3/5] Setting up self-healing LaunchDaemon -> $DAEMON_LABEL"
 mkdir -p "$STASH"
-install -o root -g wheel -m 0700 "$BACKEND_SRC" "$STASH/captusb"
+install -o root -g wheel -m 0755 "$BACKEND_SRC" "$STASH/captusb"
 install -o root -g wheel -m 0755 "$DIR/prebuilt/arm64/usb_filter" "$STASH/usb_filter"
 install -o root -g wheel -m 0644 "$PPD_SRC" "$STASH/CanonLBP-810.ppd"
 rm -rf "$STASH/CanonLBP810Progress.app"
@@ -92,7 +92,7 @@ PPD="$PPD_DIR/CanonLBP-810.ppd"
 QUEUE="Canon_LBP810"
 
 if [ ! -x "$BACKEND" ] && [ -f "$STASH/captusb" ]; then
-  /usr/bin/install -o root -g wheel -m 0700 "$STASH/captusb" "$BACKEND"
+  /usr/bin/install -o root -g wheel -m 0755 "$STASH/captusb" "$BACKEND"
   /usr/bin/logger -t lbp810-heal "Restored CUPS backend captusb"
 fi
 
@@ -107,16 +107,21 @@ if [ ! -f "$PPD" ] && [ -f "$STASH/CanonLBP-810.ppd" ]; then
   /usr/bin/logger -t lbp810-heal "Restored PPD file"
 fi
 
+URI="$("$BACKEND" 2>/dev/null | /usr/bin/awk '$1 == "direct" && $2 ~ /^captusb:/ {print $2; exit}' || true)"
+if [ -z "$URI" ]; then
+  URI="captusb://Canon/LBP-810?drv=capt"
+fi
+
 if ! /usr/bin/lpstat -p "$QUEUE" >/dev/null 2>&1; then
-  URI="$("$BACKEND" 2>/dev/null | /usr/bin/awk '$1 == "direct" && $2 ~ /^captusb:/ {print $2; exit}')"
-  if [ -n "$URI" ] && [ -f "$PPD" ]; then
+  if [ -f "$PPD" ]; then
     /usr/sbin/lpadmin -x Canon_LBP_810 2>/dev/null || true
+    /usr/sbin/lpadmin -x "Canon_LBP-810" 2>/dev/null || true
     /usr/sbin/lpadmin -p "$QUEUE" -v "$URI" -P "$PPD" -E -D "Canon LBP-810" \
       -o printer-is-shared=false -o printer-error-policy=retry-job
     /usr/sbin/lpadmin -d "$QUEUE" 2>/dev/null || true
     /usr/sbin/cupsenable "$QUEUE" 2>/dev/null || true
     /usr/sbin/cupsaccept "$QUEUE" 2>/dev/null || true
-    /usr/bin/logger -t lbp810-heal "Restored print queue $QUEUE"
+    /usr/bin/logger -t lbp810-heal "Created print queue $QUEUE"
   fi
 fi
 exit 0
@@ -137,6 +142,8 @@ cat > "$DAEMON_PLIST" << PLISTEOF
     </array>
     <key>RunAtLoad</key>
     <true/>
+    <key>StartInterval</key>
+    <integer>15</integer>
 </dict>
 </plist>
 PLISTEOF
@@ -176,8 +183,8 @@ if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ]; then
   /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/open "$STASH/CanonLBP810Progress.app" 2>/dev/null || true
 fi
 
-# 4. Search for USB printer
-echo "==> [4/5] Detecting Canon LBP-810 over USB..."
+# 4. Search for USB printer & Configure Queue
+echo "==> [4/5] Configuring CUPS print queue '$QUEUE_NAME'..."
 DEVICE_URI="$("$BACKEND_DST" 2>/dev/null | awk '$1 == "direct" && $2 ~ /^captusb:/ {print $2; exit}' || true)"
 
 if [ -z "$DEVICE_URI" ]; then
@@ -185,24 +192,24 @@ if [ -z "$DEVICE_URI" ]; then
   DEVICE_URI="$("$LPINFO" -v 2>/dev/null | awk '$2 ~ /^captusb:/ {print $2; exit}' || true)"
 fi
 
-if [ -n "$DEVICE_URI" ]; then
-  echo "    Found printer: $DEVICE_URI"
-  # Remove conflicting legacy / auto-added Apple USB queues
-  "$LPADMIN" -x Canon_LBP_810 2>/dev/null || true
-  "$LPADMIN" -x "Canon_LBP-810" 2>/dev/null || true
-
-  echo "==> [5/5] Creating CUPS print queue '$QUEUE_NAME'..."
-  "$LPADMIN" -p "$QUEUE_NAME" -v "$DEVICE_URI" -P "$PPD_DST" -E -D "$QUEUE_DESC" \
-    -o printer-is-shared=false -o printer-error-policy=retry-job
-  "$LPADMIN" -d "$QUEUE_NAME"
-  "$CUPSENABLE" "$QUEUE_NAME" 2>/dev/null || true
-  "$CUPSACCEPT" "$QUEUE_NAME" 2>/dev/null || true
-  echo "    Print queue successfully created and set as system default!"
+if [ -z "$DEVICE_URI" ]; then
+  echo "    Printer not connected yet; using universal hardware URI."
+  DEVICE_URI="captusb://Canon/LBP-810?drv=capt"
 else
-  echo "==> [4/5] Note: Canon LBP-810 is not currently detected on USB."
-  echo "    Driver backend, PPD, and self-healing daemon have been installed."
-  echo "    Connect and power on the printer, then run ./setup.sh again to create the queue."
+  echo "    Live printer found: $DEVICE_URI"
 fi
+
+# Remove conflicting legacy / auto-added Apple USB queues
+"$LPADMIN" -x Canon_LBP_810 2>/dev/null || true
+"$LPADMIN" -x "Canon_LBP-810" 2>/dev/null || true
+
+echo "==> [5/5] Creating CUPS print queue '$QUEUE_NAME'..."
+"$LPADMIN" -p "$QUEUE_NAME" -v "$DEVICE_URI" -P "$PPD_DST" -E -D "$QUEUE_DESC" \
+  -o printer-is-shared=false -o printer-error-policy=retry-job
+"$LPADMIN" -d "$QUEUE_NAME"
+"$CUPSENABLE" "$QUEUE_NAME" 2>/dev/null || true
+"$CUPSACCEPT" "$QUEUE_NAME" 2>/dev/null || true
+echo "    Print queue successfully created and set as system default!"
 
 echo "=========================================================="
 echo "  ✅ Installation complete!"

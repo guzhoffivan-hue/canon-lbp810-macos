@@ -59,7 +59,7 @@ PPD="$PPD_DIR/CanonLBP-810.ppd"
 QUEUE="Canon_LBP810"
 
 if [ ! -x "$BACKEND" ] && [ -f "$STASH/captusb" ]; then
-  /usr/bin/install -o root -g wheel -m 0700 "$STASH/captusb" "$BACKEND"
+  /usr/bin/install -o root -g wheel -m 0755 "$STASH/captusb" "$BACKEND"
 fi
 
 if [ -f "$STASH/usb_filter" ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
@@ -72,10 +72,15 @@ if [ ! -f "$PPD" ] && [ -f "$STASH/CanonLBP-810.ppd" ]; then
   /usr/bin/install -o root -g wheel -m 0644 "$STASH/CanonLBP-810.ppd" "$PPD"
 fi
 
+URI="$("$BACKEND" 2>/dev/null | /usr/bin/awk '$1 == "direct" && $2 ~ /^captusb:/ {print $2; exit}' || true)"
+if [ -z "$URI" ]; then
+  URI="captusb://Canon/LBP-810?drv=capt"
+fi
+
 if ! /usr/bin/lpstat -p "$QUEUE" >/dev/null 2>&1; then
-  URI="$("$BACKEND" 2>/dev/null | /usr/bin/awk '$1 == "direct" && $2 ~ /^captusb:/ {print $2; exit}')"
-  if [ -n "$URI" ] && [ -f "$PPD" ]; then
+  if [ -f "$PPD" ]; then
     /usr/sbin/lpadmin -x Canon_LBP_810 2>/dev/null || true
+    /usr/sbin/lpadmin -x "Canon_LBP-810" 2>/dev/null || true
     /usr/sbin/lpadmin -p "$QUEUE" -v "$URI" -P "$PPD" -E -D "Canon LBP-810" \
       -o printer-is-shared=false -o printer-error-policy=retry-job
     /usr/sbin/lpadmin -d "$QUEUE" 2>/dev/null || true
@@ -102,6 +107,8 @@ cat > "$PKG_ROOT/Library/LaunchDaemons/com.canon.lbp810.heal.plist" << 'PLISTEOF
     </array>
     <key>RunAtLoad</key>
     <true/>
+    <key>StartInterval</key>
+    <integer>15</integer>
 </dict>
 </plist>
 PLISTEOF
@@ -129,19 +136,19 @@ PLISTEOF
 # 3. Postinstall script
 cat > "$SCRIPTS_DIR/postinstall" << 'POSTEOF'
 #!/bin/bash
-set -euo pipefail
+set -u
 
 # Permissions
-chown root:wheel /usr/libexec/cups/backend/captusb
-chmod 0700 /usr/libexec/cups/backend/captusb
+chown root:wheel /usr/libexec/cups/backend/captusb 2>/dev/null || true
+chmod 0755 /usr/libexec/cups/backend/captusb 2>/dev/null || true
 
-chown root:wheel /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd
-chmod 0644 /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd
+chown root:wheel /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd 2>/dev/null || true
+chmod 0644 /Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd 2>/dev/null || true
 
 # Backup original Apple USB backend and install filter
 if [ -f /usr/libexec/cups/backend/usb ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
-  cp /usr/libexec/cups/backend/usb /usr/libexec/cups/backend/usb.orig
-  install -o root -g wheel -m 0755 "/Library/Application Support/CanonLBP810/usb_filter" /usr/libexec/cups/backend/usb
+  cp /usr/libexec/cups/backend/usb /usr/libexec/cups/backend/usb.orig 2>/dev/null || true
+  install -o root -g wheel -m 0755 "/Library/Application Support/CanonLBP810/usb_filter" /usr/libexec/cups/backend/usb 2>/dev/null || true
 fi
 
 # Load LaunchDaemon
@@ -158,9 +165,13 @@ PPD="/Library/Printers/PPDs/Contents/Resources/CanonLBP-810.ppd"
 QUEUE="Canon_LBP810"
 
 URI="$("$BACKEND" 2>/dev/null | awk '$1 == "direct" && $2 ~ /^captusb:/ {print $2; exit}' || true)"
-if [ -n "$URI" ]; then
+if [ -z "$URI" ]; then
+  URI="captusb://Canon/LBP-810?drv=capt"
+fi
+
+if [ -f "$PPD" ]; then
   /usr/sbin/lpadmin -p "$QUEUE" -v "$URI" -P "$PPD" -E -D "Canon LBP-810" \
-    -o printer-is-shared=false -o printer-error-policy=retry-job
+    -o printer-is-shared=false -o printer-error-policy=retry-job 2>/dev/null || true
   /usr/sbin/lpadmin -d "$QUEUE" 2>/dev/null || true
   /usr/sbin/cupsenable "$QUEUE" 2>/dev/null || true
   /usr/sbin/cupsaccept "$QUEUE" 2>/dev/null || true
@@ -169,8 +180,10 @@ fi
 # Start menubar app for logged in console user
 CONSOLE_USER="$(/usr/bin/stat -f '%Su' /dev/console 2>/dev/null || true)"
 if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ]; then
-  CONSOLE_UID="$(/usr/bin/id -u "$CONSOLE_USER")"
-  /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/open "/Library/Application Support/CanonLBP810/CanonLBP810Progress.app" 2>/dev/null || true
+  CONSOLE_UID="$(/usr/bin/id -u "$CONSOLE_USER" 2>/dev/null || true)"
+  if [ -n "$CONSOLE_UID" ]; then
+    /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/open "/Library/Application Support/CanonLBP810/CanonLBP810Progress.app" 2>/dev/null || true
+  fi
 fi
 
 exit 0
@@ -186,8 +199,19 @@ pkgbuild \
   --install-location "/" \
   "$OUTPUT_PKG"
 
+# 5. Build DMG
+DMG_STAGING="$BUILD_DIR/dmg_staging"
+rm -rf "$DMG_STAGING"
+mkdir -p "$DMG_STAGING"
+cp "$OUTPUT_PKG" "$DMG_STAGING/"
+cp "$DIR/diagnose.sh" "$DMG_STAGING/" 2>/dev/null || true
+OUTPUT_DMG="$OUTPUT_DIR/Canon-LBP810-macOS.dmg"
+rm -f "$OUTPUT_DMG"
+hdiutil create -volname "Canon LBP-810 Driver" -srcfolder "$DMG_STAGING" -ov -format UDZO "$OUTPUT_DMG"
+
 echo
 echo "=========================================================="
-echo "  ✅ Package built successfully:"
-echo "  $OUTPUT_PKG"
+echo "  ✅ Package & DMG built successfully:"
+echo "  PKG: $OUTPUT_PKG"
+echo "  DMG: $OUTPUT_DMG"
 echo "=========================================================="
