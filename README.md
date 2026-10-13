@@ -82,6 +82,19 @@ lpstat -p Canon_LBP810
 
 ---
 
+## Known Issues (Version 1.0)
+
+### Two "Canon LBP-810" printers displayed in macOS
+On macOS (especially with Apple Silicon USB-C connections or local network printer sharing), **System Settings ▸ Printers & Scanners** and print dialogs (`Cmd + P`) may show two entries for **Canon LBP-810**:
+1. **Working Driver Queue (`Canon_LBP810`):** Created by this driver, properly encodes CAPT v1 / SCoA raster data and transmits to hardware. Marked as *"Last Used"* (*Посл. исп.*).
+2. **System Auto-Discovery Duplicate / Network Printer:** Created automatically by macOS USB plug-and-play or network Bonjour sharing. Sending jobs to this duplicate will fail with a transmission error ("Cannot send data to printer").
+
+**Recommended Solution:**
+* In **System Settings ▸ Printers & Scanners**, ensure **Default Printer** is set to **"Last Used"**.
+* Select the working **Canon LBP-810** queue (marked as *"Last Used"* / *"Посл. исп."*) when printing. macOS will remember it and automatically default to the working queue for future jobs.
+
+---
+
 ## Diagnostics
 
 If the printer is not responding or you want to check hardware status:
