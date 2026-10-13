@@ -26,9 +26,6 @@ mkdir -p "$PKG_ROOT" "$SCRIPTS_DIR" "$OUTPUT_DIR"
   cp build/captusb prebuilt/arm64/
   cp build/usb_filter prebuilt/arm64/
   cp build/ppd/LBP810CAPTPPD.ppd prebuilt/arm64/
-  swiftc -O -target arm64-apple-macos14.0 src/menubar/CanonLBP810Progress.swift -o prebuilt/arm64/CanonLBP810Progress
-  mkdir -p prebuilt/arm64/CanonLBP810Progress.app/Contents/MacOS
-  cp prebuilt/arm64/CanonLBP810Progress prebuilt/arm64/CanonLBP810Progress.app/Contents/MacOS/
 )
 
 # 2. Stage files in root
@@ -36,7 +33,6 @@ STASH_DIR="$PKG_ROOT/Library/Application Support/CanonLBP810"
 mkdir -p "$PKG_ROOT/usr/libexec/cups/backend"
 mkdir -p "$PKG_ROOT/Library/Printers/PPDs/Contents/Resources"
 mkdir -p "$PKG_ROOT/Library/LaunchDaemons"
-mkdir -p "$PKG_ROOT/Library/LaunchAgents"
 mkdir -p "$STASH_DIR"
 
 cp "$DIR/prebuilt/arm64/captusb" "$PKG_ROOT/usr/libexec/cups/backend/captusb"
@@ -46,7 +42,6 @@ cp "$DIR/prebuilt/arm64/LBP810CAPTPPD.ppd" "$PKG_ROOT/Library/Printers/PPDs/Cont
 cp "$DIR/prebuilt/arm64/captusb" "$STASH_DIR/captusb"
 cp "$DIR/prebuilt/arm64/usb_filter" "$STASH_DIR/usb_filter"
 cp "$DIR/prebuilt/arm64/LBP810CAPTPPD.ppd" "$STASH_DIR/CanonLBP-810.ppd"
-cp -r "$DIR/prebuilt/arm64/CanonLBP810Progress.app" "$STASH_DIR/"
 
 # Heal script
 cat > "$STASH_DIR/heal.sh" << 'HEALEOF'
@@ -113,30 +108,16 @@ cat > "$PKG_ROOT/Library/LaunchDaemons/com.canon.lbp810.heal.plist" << 'PLISTEOF
 </plist>
 PLISTEOF
 
-# LaunchAgent plist for MenuBar app
-cat > "$PKG_ROOT/Library/LaunchAgents/com.canon.lbp810.progress.plist" << 'PLISTEOF'
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>com.canon.lbp810.progress</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/Library/Application Support/CanonLBP810/CanonLBP810Progress.app/Contents/MacOS/CanonLBP810Progress</string>
-    </array>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>KeepAlive</key>
-    <true/>
-</dict>
-</plist>
-PLISTEOF
-
 # 3. Postinstall script
 cat > "$SCRIPTS_DIR/postinstall" << 'POSTEOF'
 #!/bin/bash
 set -u
+
+# Cleanup any legacy menubar progress app from previous installs
+launchctl unload /Library/LaunchAgents/com.canon.lbp810.progress.plist 2>/dev/null || true
+rm -f /Library/LaunchAgents/com.canon.lbp810.progress.plist 2>/dev/null || true
+rm -rf "/Library/Application Support/CanonLBP810/CanonLBP810Progress.app" 2>/dev/null || true
+killall CanonLBP810Progress 2>/dev/null || true
 
 # Permissions
 chown root:wheel /usr/libexec/cups/backend/captusb 2>/dev/null || true
@@ -175,15 +156,6 @@ if [ -f "$PPD" ]; then
   /usr/sbin/lpadmin -d "$QUEUE" 2>/dev/null || true
   /usr/sbin/cupsenable "$QUEUE" 2>/dev/null || true
   /usr/sbin/cupsaccept "$QUEUE" 2>/dev/null || true
-fi
-
-# Start menubar app for logged in console user
-CONSOLE_USER="$(/usr/bin/stat -f '%Su' /dev/console 2>/dev/null || true)"
-if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ]; then
-  CONSOLE_UID="$(/usr/bin/id -u "$CONSOLE_USER" 2>/dev/null || true)"
-  if [ -n "$CONSOLE_UID" ]; then
-    /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/open "/Library/Application Support/CanonLBP810/CanonLBP810Progress.app" 2>/dev/null || true
-  fi
 fi
 
 exit 0

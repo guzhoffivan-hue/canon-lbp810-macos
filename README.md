@@ -14,7 +14,6 @@ The **Canon LBP-810** is a classic host-based (GDI) laser printer using the prop
 * **Apple Silicon Native (arm64):** Compiled with Clang for Apple Silicon, zero emulation required.
 * **Self-Contained Binary:** Built with static `libusb`, no external Homebrew dependencies at runtime.
 * **System Settings & GUI Integration:** Standard print dialog support across Preview, Safari, Pages, Microsoft Office, etc.
-* **Live Menu Bar Progress:** Native status app displays real-time page progress (`🖨 2/5`) and job notifications in the menu bar.
 * **Clean Hardware Discovery:** Filters out broken default Apple USB entries from the "Add Printer" dialog.
 * **Persistent Self-Healing Daemon:** Survives macOS system updates automatically.
 

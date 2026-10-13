@@ -72,8 +72,6 @@ mkdir -p "$STASH"
 install -o root -g wheel -m 0755 "$BACKEND_SRC" "$STASH/captusb"
 install -o root -g wheel -m 0755 "$DIR/prebuilt/arm64/usb_filter" "$STASH/usb_filter"
 install -o root -g wheel -m 0644 "$PPD_SRC" "$STASH/CanonLBP-810.ppd"
-rm -rf "$STASH/CanonLBP810Progress.app"
-cp -r "$DIR/prebuilt/arm64/CanonLBP810Progress.app" "$STASH/"
 
 # Install USB backend filter to hide broken Apple USB from Add Printer dialog
 if [ -f /usr/libexec/cups/backend/usb ] && [ ! -f /usr/libexec/cups/backend/usb.orig ]; then
@@ -152,36 +150,11 @@ chmod 0644 "$DAEMON_PLIST"
 launchctl unload "$DAEMON_PLIST" 2>/dev/null || true
 launchctl load "$DAEMON_PLIST" 2>/dev/null || true
 
-# LaunchAgent for MenuBar progress monitor
-AGENT_LABEL="com.canon.lbp810.progress"
-AGENT_PLIST="/Library/LaunchAgents/$AGENT_LABEL.plist"
-cat > "$AGENT_PLIST" << PLISTEOF
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-    <key>Label</key>
-    <string>$AGENT_LABEL</string>
-    <key>ProgramArguments</key>
-    <array>
-        <string>/Library/Application Support/CanonLBP810/CanonLBP810Progress.app/Contents/MacOS/CanonLBP810Progress</string>
-    </array>
-    <key>RunAtLoad</key>
-    <true/>
-    <key>KeepAlive</key>
-    <true/>
-</dict>
-</plist>
-PLISTEOF
-chown root:wheel "$AGENT_PLIST"
-chmod 0644 "$AGENT_PLIST"
-
-# Launch MenuBar app for current console user
-CONSOLE_USER="$(/usr/bin/stat -f '%Su' /dev/console 2>/dev/null || true)"
-if [ -n "$CONSOLE_USER" ] && [ "$CONSOLE_USER" != "root" ]; then
-  CONSOLE_UID="$(/usr/bin/id -u "$CONSOLE_USER")"
-  /bin/launchctl asuser "$CONSOLE_UID" /usr/bin/open "$STASH/CanonLBP810Progress.app" 2>/dev/null || true
-fi
+# Clean up any legacy menubar progress app from previous installs
+launchctl unload /Library/LaunchAgents/com.canon.lbp810.progress.plist 2>/dev/null || true
+rm -f /Library/LaunchAgents/com.canon.lbp810.progress.plist 2>/dev/null || true
+rm -rf "$STASH/CanonLBP810Progress.app" 2>/dev/null || true
+killall CanonLBP810Progress 2>/dev/null || true
 
 # 4. Search for USB printer & Configure Queue
 echo "==> [4/5] Configuring CUPS print queue '$QUEUE_NAME'..."
